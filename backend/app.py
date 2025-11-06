@@ -1,11 +1,11 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend', static_url_path='')
 CORS(app)
 
 app.config['JSON_SORT_KEYS'] = False
@@ -17,18 +17,13 @@ app.register_blueprint(chat_bp)
 def health_check():
     return jsonify({'status': 'healthy', 'service': 'ChatBot Bro Backend'}), 200
 
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({
-        'message': 'Welcome to ChatBot Bro Backend!',
-        'status': 'running',
-        'endpoints': {
-            'create_conversation': 'POST /api/chat/conversations',
-            'send_message': 'POST /api/chat/conversations/<id>/messages',
-            'get_messages': 'GET /api/chat/conversations/<id>/messages',
-            'get_conversations': 'GET /api/chat/conversations'
-        }
-    }), 200
+@app.route('/')
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    return send_from_directory(app.static_folder, filename)
 
 @app.errorhandler(404)
 def not_found(error):
