@@ -22,7 +22,7 @@ function setupEventListeners() {
 }
 async function createNewConversation() {
     try {
-        const response = await fetch(`${API_BASE_URL}/chat/conversations`, {
+        const response = await fetch(`${window.API_BASE_URL}/chat/conversations`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ async function createNewConversation() {
 }
 async function loadConversations() {
     try {
-        const response = await fetch(`${API_BASE_URL}/chat/conversations?user_id=${currentUserId}`);
+        const response = await fetch(`${window.API_BASE_URL}/chat/conversations?user_id=${currentUserId}`);
         const data = await response.json();
         if (data.status === 'success') {
             const conversationsList = document.getElementById('conversationsList');
@@ -106,7 +106,7 @@ async function handleSendMessage(e) {
     addMessageToUI(message, 'user');
     messageInput.value = '';
     try {
-        const response = await fetch(`${API_BASE_URL}/chat/conversations/${currentConversationId}/messages`, {
+        const response = await fetch(`${window.API_BASE_URL}/chat/conversations/${currentConversationId}/messages`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ function addMessageToUI(text, sender) {
 }
 async function loadMessages() {
     try {
-        const response = await fetch(`${API_BASE_URL}/chat/conversations/${currentConversationId}/messages`);
+        const response = await fetch(`${window.API_BASE_URL}/chat/conversations/${currentConversationId}/messages`);
         const data = await response.json();
         if (data.status === 'success') {
             data.messages.forEach((msg, index) => {

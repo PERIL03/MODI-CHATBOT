@@ -1,5 +1,5 @@
 {
-  "name": "ChatBot Copilot",
+  "name": "chatbot-copilot",
   "version": "1.0.0",
   "description": "An Indian boy best friend chatbot using Flask, MongoDB, and Anime.js",
   "main": "backend/app.py",
