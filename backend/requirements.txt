@@ -6,3 +6,4 @@ google-cloud-texttospeech==2.33.0
 google-auth==2.22.0
 requests==2.31.0
 google-generativeai==0.3.0
+gunicorn==21.2.0
