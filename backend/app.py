@@ -5,7 +5,7 @@ import os
 
 load_dotenv()
 
-app = Flask(__name__, static_folder='../frontend', static_url_path='')
+app = Flask(__name__, static_folder='../frontend', static_url_path='/')
 CORS(app)
 
 app.config['JSON_SORT_KEYS'] = False
@@ -17,16 +17,13 @@ app.register_blueprint(chat_bp)
 def health_check():
     return jsonify({'status': 'healthy', 'service': 'ChatBot Bro Backend'}), 200
 
-@app.route('/')
-def serve_index():
-    return send_from_directory(app.static_folder, 'index.html')
-
-@app.route('/<path:filename>')
-def serve_static(filename):
-    return send_from_directory(app.static_folder, filename)
-
 @app.errorhandler(404)
 def not_found(error):
+    if error.description == 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.':
+        try:
+            return send_from_directory(app.static_folder, 'index.html')
+        except:
+            return jsonify({'status': 'error', 'message': 'Not found'}), 404
     return jsonify({'status': 'error', 'message': 'Endpoint not found'}), 404
 
 @app.errorhandler(500)
