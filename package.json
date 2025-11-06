@@ -1,0 +1,24 @@
+{
+  "name": "ChatBot Copilot",
+  "version": "1.0.0",
+  "description": "An Indian boy best friend chatbot using Flask, MongoDB, and Anime.js",
+  "main": "backend/app.py",
+  "scripts": {
+    "start": "cd backend && python app.py",
+    "dev": "cd backend && python app.py"
+  },
+  "keywords": [
+    "chatbot",
+    "flask",
+    "mongodb",
+    "anime.js",
+    "google-tts",
+    "voice"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
