@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -14,26 +14,42 @@ app.config['JSON_SORT_KEYS'] = False
 from routes.chat import chat_bp
 app.register_blueprint(chat_bp)
 
-frontend_path = Path(__file__).parent.parent / 'frontend'
+frontend_dir = Path(__file__).parent.parent / 'frontend'
 
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'healthy', 'service': 'ChatBot Bro Backend'}), 200
 
 @app.route('/')
-def serve_index():
-    return send_from_directory(frontend_path, 'index.html')
+def index():
+    try:
+        return send_file(frontend_dir / 'index.html')
+    except:
+        return jsonify({'error': 'index.html not found'}), 500
 
 @app.route('/<path:filename>')
 def serve_static(filename):
+    if not filename or filename.startswith('api'):
+        return jsonify({'error': 'Not found'}), 404
+    
     try:
-        return send_from_directory(frontend_path, filename)
+        file_path = frontend_dir / filename
+        if file_path.exists() and file_path.is_file():
+            return send_file(file_path)
     except:
-        return send_from_directory(frontend_path, 'index.html')
+        pass
+    
+    try:
+        return send_file(frontend_dir / 'index.html')
+    except:
+        return jsonify({'error': 'Not found'}), 404
 
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify({'status': 'error', 'message': 'Endpoint not found'}), 404
+    try:
+        return send_file(frontend_dir / 'index.html')
+    except:
+        return jsonify({'status': 'error', 'message': 'Endpoint not found'}), 404
 
 @app.errorhandler(500)
 def internal_error(error):
