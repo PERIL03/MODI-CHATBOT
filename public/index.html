@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gemini Chatbot - AI Assistant</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    
+    .chat-container {
+      padding: 30px;
+    }
+    
+    .chat { 
+      background: #f8f9fa;
+      border: none;
+      border-radius: 15px;
+      padding: 20px;
+      min-height: 400px;
+      max-height: 500px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .chat::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .chat::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    .chat::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+    
+    .msg { 
+      margin: 15px 0;
+      animation: fadeInUp 0.3s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .user { 
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    .user > div {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 18px;
+      border-radius: 18px 18px 4px 18px;
+      max-width: 80%;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      font-weight: 500;
+    }
+    
+    .bot { 
+      display: flex;
+      justify-content: flex-start;
+    }
+    
+    .bot > div {
+      background: white;
+      color: #333;
+      padding: 15px 20px;
+      border-radius: 18px 18px 18px 4px;
+      max-width: 90%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #4facfe;
+    }
+    
+    .bot h2, .bot h3, .bot h4 { 
+      margin: 12px 0 8px 0; 
+      color: #2d3748; 
+      font-weight: 600;
+    }
+    
+    .bot h2 { font-size: 1.3em; color: #4facfe; }
+    .bot h3 { font-size: 1.2em; color: #667eea; }
+    .bot h4 { font-size: 1.1em; color: #764ba2; }
+    
+    .bot strong { 
+      color: #4facfe; 
+      font-weight: 600;
+    }
+    
+    .bot em { 
+      color: #718096; 
+      font-style: italic; 
+    }
+    
+    .controls {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .controls label {
+      font-weight: 600;
+      color: #4a5568;
+    }
+    
+    select {
+      padding: 10px 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      background: white;
+      color: #4a5568;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    select:focus {
+      outline: none;
+      border-color: #4facfe;
+      box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #4a5568;
+    }
+    
+    .btn-secondary:hover {
+      background: #cbd5e0;
+      transform: translateY(-2px);
+    }
+    
+    form { 
+      display: flex; 
+      gap: 12px; 
+      margin-top: 20px;
+    }
+    
+    input[type=text] { 
+      flex: 1; 
+      padding: 15px 20px; 
+      border: 2px solid #e2e8f0; 
+      border-radius: 25px; 
+      font-size: 16px;
+      background: white;
+      transition: all 0.3s ease;
+    }
+    
+    input[type=text]:focus {
+      outline: none;
+      border-color: #4facfe;
+      box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+    }
+    
+    .thinking {
+      opacity: 0.7;
+      font-style: italic;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        border-radius: 15px;
+      }
+      
+      .header {
+        padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 2em;
+      }
+      
+      .chat-container {
+        padding: 20px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      form {
+        flex-direction: column;
+      }
+      
+      .btn-primary {
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <p>Experience AI conversation in PM Modi's distinctive Hinglish speaking style</p>
+      <p style="font-size: 14px; opacity: 0.8; margin-top: 10px;">💡 Tip: Try different voices from the dropdown to find one that sounds more Modi-like. Look for deeper, more authoritative voices like "Daniel", "Alex", or "Fred".</p>
+    </div>
+    
+    <div class="chat-container">
+      <div class="controls">
+        <label for="persona">Choose Personality:</label>
+        <select id="persona">
+          <option value="modi">🇮🇳 Modi Style</option>
+        </select>
+        <label for="voiceSelect" style="margin-left: 20px;">Voice:</label>
+        <select id="voiceSelect">
+          <option value="">Loading voices...</option>
+        </select>
+        <button id="clearBtn" type="button" class="btn btn-secondary">🗑️ Clear Chat</button>
+        <button id="stopSpeechBtn" type="button" class="btn btn-secondary" onclick="stopSpeech()">🔇 Stop Speech</button>
+        <button id="testVoiceBtn" type="button" class="btn btn-secondary" onclick="testCurrentVoice()">🎤 Test Voice</button>
+      </div>
+      
+      <div class="chat" id="chat"></div>
+
+      <form id="form">
+        <input id="input" type="text" placeholder="Type your message here..." autocomplete="off" />
+        <button type="submit" class="btn-primary">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const chatEl = document.getElementById('chat');
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const personaEl = document.getElementById('persona');
+    const clearBtn = document.getElementById('clearBtn');
+
+    // Simple persistent session id for demo purposes
+    const SESSION_KEY = 'scb_session';
+    let sessionId = localStorage.getItem(SESSION_KEY) || null;
+
+    // Text-to-speech functionality for Modi's voice
+    let speechSynthesis = window.speechSynthesis;
+    let modiVoice = null;
+
+    // Initialize speech synthesis and find appropriate voice
+    function initializeSpeech() {
+      if (!speechSynthesis) {
+        console.log('Speech synthesis not supported');
+        return;
+      }
+      
+      // Wait for voices to load
+      function setVoice() {
+        const voices = speechSynthesis.getVoices();
+        console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+        
+        // Populate voice selector
+        const voiceSelect = document.getElementById('voiceSelect');
+        voiceSelect.innerHTML = '';
+        
+        // Filter to English voices only and add to selector
+        const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+        englishVoices.forEach((voice, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.textContent = `${voice.name} (${voice.lang})`;
+          voiceSelect.appendChild(option);
+        });
+        
+        // Try to find the best voice for Modi - prefer deeper, more authoritative voices
+        modiVoice = voices.find(voice => 
+          voice.name.toLowerCase().includes('indian') ||
+          voice.name.toLowerCase().includes('ravi') ||
+          voice.lang.includes('en-IN')
+        ) || voices.find(voice => 
+          voice.name.toLowerCase().includes('daniel') ||
+          voice.name.toLowerCase().includes('alex') ||
+          voice.name.toLowerCase().includes('fred') ||
+          voice.name.toLowerCase().includes('arthur') ||
+          voice.name.toLowerCase().includes('thomas')
+        ) || voices.find(voice => voice.lang.startsWith('en'));
+        
+        // Set the voice selector to the chosen voice
+        if (modiVoice) {
+          const voiceIndex = englishVoices.findIndex(v => v.name === modiVoice.name);
+          if (voiceIndex !== -1) {
+            voiceSelect.selectedIndex = voiceIndex;
+          }
+          console.log('Selected voice for Modi:', modiVoice.name, modiVoice.lang);
+        }
+        
+        // Add event listener for voice changes
+        voiceSelect.addEventListener('change', () => {
+          const selectedIndex = voiceSelect.selectedIndex;
+          if (selectedIndex >= 0 && englishVoices[selectedIndex]) {
+            modiVoice = englishVoices[selectedIndex];
+            console.log('Voice changed to:', modiVoice.name);
+          }
+        });
+      }
+      
+      if (speechSynthesis.getVoices().length !== 0) {
+        setVoice();
+      } else {
+        speechSynthesis.addEventListener('voiceschanged', setVoice);
+      }
+    }
+
+    // Function to speak text in Modi's style
+    function speakAsModi(text) {
+      if (!speechSynthesis || !modiVoice) {
+        console.log('Speech synthesis not available');
+        return;
+      }
+
+      // Stop any current speech
+      speechSynthesis.cancel();
+
+      // Clean the text for speech (remove HTML and markdown)
+      let cleanText = text
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove markdown bold
+        .replace(/\*(.*?)\*/g, '$1') // Remove markdown italic
+        .replace(/###\s/g, '') // Remove markdown headers
+        .replace(/##\s/g, '')
+        .replace(/•\s/g, '') // Remove bullet points
+        .trim();
+
+      if (!cleanText) return;
+
+      // Add Modi-specific speech modifications
+      cleanText = cleanText
+        .replace(/\bMitron\b/g, 'Mee-tron') // Emphasize the way Modi says it
+        .replace(/\bBharat\b/g, 'Bhaa-rat') // Elongate important words
+        .replace(/\bIndia\b/g, 'In-di-ya') // Modi's pronunciation
+        .replace(/\bDigital India\b/g, 'Di-ji-tal In-di-ya')
+        .replace(/\bAtmanirbhar\b/g, 'Aat-ma-nir-bhar') // Break down complex Hindi words
+        .replace(/!/g, '!... ') // Add pauses after exclamations
+        .replace(/\.\s/g, '..... ') // Longer pauses between sentences
+        .replace(/,\s/g, ',.. '); // Short pauses after commas
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.voice = modiVoice;
+      utterance.rate = 0.75; // Even slower, more deliberate like Modi's speeches
+      utterance.pitch = 0.7; // Lower pitch for more authority
+      utterance.volume = 0.9; // Louder, more commanding
+      
+      // Add emphasis and pauses
+      utterance.onboundary = function(event) {
+        if (event.charIndex > 0) {
+          const char = cleanText[event.charIndex];
+          const prevChar = cleanText[event.charIndex - 1];
+          
+          // Pause after exclamations and periods for dramatic effect
+          if ((char === ' ' && (prevChar === '!' || prevChar === '.')) ||
+              (char === '.' && event.charIndex < cleanText.length - 2)) {
+            speechSynthesis.pause();
+            setTimeout(() => {
+              if (speechSynthesis.paused) speechSynthesis.resume();
+            }, 400); // Longer pauses
+          }
+        }
+      };
+
+      // Log for debugging
+      console.log('Speaking as Modi:', cleanText.substring(0, 50) + '...');
+      console.log('Voice:', modiVoice.name, 'Rate:', utterance.rate, 'Pitch:', utterance.pitch);
+      
+      speechSynthesis.speak(utterance);
+    }
+
+    // Function to stop speech
+    function stopSpeech() {
+      if (speechSynthesis) {
+        speechSynthesis.cancel();
+      }
+    }
+
+    // Function to test current voice with a sample Modi phrase
+    function testCurrentVoice() {
+      const testPhrase = "Mitron! Namaste! Main aapka Modi hun. Digital India, Atmanirbhar Bharat, sabka saath sabka vikas!";
+      speakAsModi(testPhrase);
+    }
+
+    // Initialize speech when page loads
+    initializeSpeech();
+
+    function appendMessage(text, who) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + (who === 'user' ? 'user' : 'bot');
+      
+      const messageDiv = document.createElement('div');
+      
+      if (who === 'bot') {
+        // Format bot messages with proper line breaks and basic markdown-style formatting
+        const formatted = text
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold text
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')              // Italic text
+          .replace(/\n/g, '<br>')                            // Line breaks
+          .replace(/###\s(.*?)(<br>|$)/g, '<h3>$1</h3>')    // H3 headers
+          .replace(/##\s(.*?)(<br>|$)/g, '<h2>$1</h2>')     // H2 headers
+          .replace(/^\*\s/gm, '• ')                          // Bullet points
+          .replace(/^\d+\.\s/gm, '')                         // Remove numbered list numbers for cleaner look
+        
+        messageDiv.innerHTML = formatted;
+        
+        // Add speaker button for Modi responses
+        if (text !== '...thinking...' && text !== 'Hello! 👋 I\'m your AI assistant powered by Gemini 2.5 Flash. Choose a personality above and let\'s chat!' && !text.includes('Conversation cleared')) {
+          const speakerBtn = document.createElement('button');
+          speakerBtn.innerHTML = '🔊';
+          speakerBtn.className = 'speaker-btn';
+          speakerBtn.style.cssText = 'margin-left: 10px; background: none; border: none; font-size: 16px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;';
+          speakerBtn.onmouseover = () => speakerBtn.style.opacity = '1';
+          speakerBtn.onmouseout = () => speakerBtn.style.opacity = '0.7';
+          speakerBtn.onclick = () => speakAsModi(text);
+          messageDiv.appendChild(speakerBtn);
+        }
+      } else {
+        messageDiv.textContent = text;
+      }
+      
+      div.appendChild(messageDiv);
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      appendMessage(text, 'user');
+      input.value = '';
+
+      appendMessage('...thinking...', 'bot');
+      const thinkingEl = chatEl.lastElementChild.querySelector('div');
+      thinkingEl.classList.add('thinking');
+
+      try {
+        const resp = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, sessionId, persona: personaEl.value })
+        });
+        const data = await resp.json();
+        // server may return a sessionId the first time; persist it
+        if (data && data.sessionId) {
+          sessionId = data.sessionId;
+          localStorage.setItem(SESSION_KEY, sessionId);
+        }
+        thinkingEl.innerHTML = data.reply || '[no reply]';
+        thinkingEl.classList.remove('thinking');
+        
+        // Speak Modi's response aloud
+        if (data.reply && personaEl.value === 'modi') {
+          speakAsModi(data.reply);
+        }
+      } catch (err) {
+        thinkingEl.textContent = 'Error contacting server';
+        thinkingEl.classList.remove('thinking');
+        console.error(err);
+      }
+    });
+
+    clearBtn.addEventListener('click', async () => {
+      if (!sessionId) {
+        // nothing to clear
+        chatEl.innerHTML = '';
+        appendMessage('Conversation cleared! 🧹', 'bot');
+        return;
+      }
+      try {
+        await fetch('/api/clear', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        });
+        localStorage.removeItem(SESSION_KEY);
+        sessionId = null;
+        chatEl.innerHTML = '';
+        appendMessage('Conversation cleared! Ready for a fresh start. 🧹', 'bot');
+      } catch (err) {
+        console.error('Failed to clear session', err);
+        appendMessage('Failed to clear conversation', 'bot');
+      }
+    });
+
+    // Small welcome message
+    appendMessage('Namaste! � Main aapka Modi-style AI assistant hun, powered by Gemini 2.5 Flash. Aap jo bhi prashna puchenge, main Modi ji ke andaaz mein jawab dunga! Let\'s chat, mitron! 🇮🇳', 'bot');
+  </script>
+</body>
+</html>
